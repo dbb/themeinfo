@@ -1,0 +1,127 @@
+				
+                                  themeinfo 
+
+-------------------------------------------------------------------------------
+VERSION
+	0.5.1
+
+EMAIL
+	dbbolton@users.sourceforge.net
+
+		Note: Only for feature requests and issue reports.
+
+WEBSITE
+	http://themeinfo.sourceforge.com
+
+SETUP
+	
+	Open 'themeinfo' and scroll down to line 34 for the options. The 
+	defaults are for GNOME.
+
+	After setting up the script, see INSTALL for installation and
+	execution instructions.
+
+
+---COLORS
+	Starting at line 14 is a list of "colors". I have no idea how these 
+	actually work, but I think that these strange sequences are actually 
+	special variables that bash interprets as "set the color of the following 
+	text to x" where x is depends on what the sequence actually is. All you
+	need to worry about is what is in between the double quotes.
+
+	Scroll down to line 37. Here, you can configure your color options. 
+	color1 is the color of your distro. So, if you want the name of your
+	distro printed in red, you would set line 42 to look like this:
+		color1 = "\033[1;31m"
+	Or, if you want it to be the same color as regular terminal text:
+		color1 = ""
+
+	The same procedure applies to color2 at line 47. This variable applies
+	to the label of your theme information attributes (such as "Icons",
+	"GTK", and so on). 
+
+	Your actual theme information (Such as "Crashbit" or "Clearlooks") will
+	print in the same color as regular terminal text.
+
+
+---AUTOMATIC CONFIGURATION
+
+	themeinfo will try to figure out your information automatically if you
+	are using a standard desktop environment setup. There is a list of
+	possible options at line 54. Set the variable 'default_de' to the
+	number correspoding to your desktop environment. If you find that this
+	doesn't work for you, try the custom setup, option 13.
+
+	If the automatic configuration does work, then your setup is complete
+	and you can skip to the "Screenshot" section.
+
+---CUSTOM SETUP
+
+----WINDOW MANAGER THEME
+	themeinfo supports the following window managers:
+		Awesome
+		Emerald
+		Kwin
+		Kwin4
+		Metacity
+		Openbox
+		PekWM
+		Xfwm4
+
+	Support for Fluxbox is on the way. Set 'print_wm' to the corresponding
+	number.
+
+----GTK/QT THEME
+	themeinfo can detect your GTK theme if you are using 
+		GNOME 
+		Xfce
+		KDE4
+	or if you set your GTK theme via the ~/.gtkrc.mine file. Set 
+	'print_gtk' to the corresponding number.
+
+	Themeinfo can detect your QT style if you are using KDE or KDE4. Set
+	'print_gt' to the corresponding number.
+
+----APPLICATION FONT
+	themeinfo can detect your application font if you are using 
+		GNOME, gconf, or gnome-settings-daemon
+		Xfce or mcs
+		~/.gtkrc.mine file
+		KDE
+		KDE 4
+	Set 'print_font' to the corresponding number.
+
+----TERMINAL FONT
+	themeinfo can detect your terminal font if you are using one of the
+	following terminal emulators:
+		gnome-terminal
+		tilda
+		urxvt
+		xfce4-terminal
+
+	Support for konsole is on the way. Set 'print_term' to the 
+	corresponding number.
+
+----ICON THEME
+	themeinfo can detect your icon theme if you are using 
+		GNOME 
+		KDE
+		KDE4 
+		Xfce
+		~/.gtkrc.mine file. 
+	Set 'print_icons' to the corresponding number.
+
+----WALLPAPER
+	themeinfo can detect your wallpaper if you are using 
+		GNOME 
+		feh
+		Fluxbox
+		KDE
+		KDE4 
+		Xfce
+
+	Set 'print_wall' to the corresponding number.
+
+---SCREENSHOT
+	themeinfo can take a screenshot automatically using 'scrot'. Set 
+	'call_scrot' to 'True' if you want it to or 'False' if you don't.

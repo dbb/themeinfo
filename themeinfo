@@ -1,0 +1,833 @@
+#!/usr/bin/python
+
+# DEVELOPMENT VERSION 0.5.1
+
+import gconf
+import os
+import string
+from os.path import exists
+from subprocess import call
+from time import strftime
+
+get_info = True
+
+#list of colors. copy these values into the COLORS section as needed.
+#do not edit
+blue = "\033[1;34m"
+green = "\033[1;32m"
+cyan = "\033[1;36m"
+red = "\033[1;31m"
+bblue = "\033[0;38;5;12m"
+orange = "\033[0;38;5;202m"
+yelloworange = "\033[0;38;5;208m"
+gold = "\033[0;38;5;214m"
+darkorange = "\033[0;38;5;130m"
+darkcyan="\033[0;38;5;32m"
+
+#change color back to default
+end="\033[0m"
+
+#end of 'do not edit'
+
+# * * * * * * * * * * * * * * * *
+#				  *
+#   OPTIONS                        * * * * * * * * * * * * * * * * * * * * * *
+#				  *
+# * * * * * * * * * * * * * * * * 
+		### COLORS ####################################################
+
+# color1 is the distro color. default is orange. 
+# don't change the name color1, just what is in quotes.
+# a list of values is at the top of the script
+color1 = "\033[0;38;5;202m" # to disable, set equal to "\033[0m"
+
+#color2 is the color of 'Icons' 'Wallpaper', etc. default is darkcyan
+#don't change the name color2, just what is in quotes.
+# a list of values is at the top of the script
+color2 = "\033[0;38;5;32m" # to disable, set equal to "\033[0m"
+
+		### AUTOMATIC CONFIGURATION
+
+# If you use one of the environments in this list, choosing a default setup
+# might save you some time. If it doesn't work, choose 13 for custom.
+
+# possible options:
+#-----------------
+# 1 = gnome		
+# 2 = gnome+emerald
+# 3 = gnome+openbox
+# 4 = xfce
+# 5 = xfce+emerald
+# 6 = xfce+openbox
+# 7 = kde
+# 8 = kde+emerald
+# 9 = kde+openbox
+# 10 = kde4
+# 11 = kde4+emerald
+# 12 = kde4+openbox
+# 13 = custom         
+
+#if you choose custom, you need to fill out the rest of the settings below.
+
+default_de = 1 		# must be a number from 1 - 13. do not leave blank!
+
+
+### CUSTOM SETUP BELOW ########################################################
+
+		### WINDOW MANAGER OPTIONS ####################################
+
+# Which window manager?
+# 1 = awesome
+# 2 = dwm
+# 3 = emerald
+# 4 = kwin (kde3)
+# 5 = kwin (kde4)
+# 6 = metacity
+# 7 = openbox
+# 8 = pekwm
+# 9 = wmii
+# 10 = xfwm4
+
+
+print_wm = 1 		# do not leave blank
+
+
+		### GTK/QT OPTIONS ############################################
+
+# How do you set your GTK theme?
+# 1 = GNOME, gconf, or gnome-settings-daemon
+# 2 = Xfce or mcs
+# 3 = ~/.gtkrc.mine file
+# 4 = using GTK apps inside KDE4
+# 5 = not using GTK apps
+
+print_gtk = 1 		# do not leave blank
+
+
+
+	### KDE Stuff
+
+# 1 = KDE 3
+# 2 = KDE 4
+# 3 = Not using KDE
+
+print_qt = 1 		# do not leave blank
+
+
+
+
+		### APPLICATION FONT OPTIONS ##################################
+
+# 1 = GNOME, gconf, or gnome-settings-daemon
+# 2 = Xfce or mcs
+# 3 = ~/.gtkrc.mine file
+# 4 = KDE
+# 5 = KDE 4
+# 6 = none
+
+print_font = 1		# do not leave blank
+
+
+
+		### TERMINAL OPTIONS ##########################################
+
+# Which terminal are you using?
+# 1 = gnome-terminal
+# 2 = tilda
+# 3 = urxvt
+# 4 = xfce4-terminal
+# 5 = none
+
+print_term = 1		# do not leave blank
+
+
+
+		### ICON OPTIONS ##############################################
+
+# How do you set your icon theme?
+# 1 = GNOME, gconf, or gnome-settings-daemon
+# 2 = Xfce or mcs
+# 3 = ~/.gtkrc.mine file
+# 4 = KDE 3
+# 5 = KDE 4
+# 6 = none
+
+print_icons = 1		# do not leave blank
+
+
+
+		### WALLPAPER OPTIONS #########################################
+
+# 1 = GNOME/Nautilus to set your wallpaper as a picture
+# 2 = GNOME/Nautilus to set your background as plain colors
+# 3 = feh
+# 4 = Xfce
+# 5 = KDE
+# 6 = KDE 4
+# 7 = Fluxbox
+# 8 = none 
+
+
+print_wall = 1		# do not leave blank
+
+
+		### SCREENSHOT OPTIONS ########################################
+
+# Take screenshot automatically? (requires scrot)
+call_scrot = False
+
+# * * * * * * * * * * * * * * * *
+#				  *
+#   End of Options                  * * * * * * * * * * * * * * * * * * * * * *
+#				  *
+# * * * * * * * * * * * * * * * *
+
+#define key to get stuff from gconf
+key = gconf.client_get_default()
+
+#########################
+# distro
+#########################
+if exists(os.path.expanduser("/etc/issue")):
+	for line in open(os.path.expanduser("/etc/issue")):
+		if " " in line:
+			distro=line
+               		break
+		else:
+			distro = "Linux ?"
+else:
+	distro = " Linux ? "
+
+distro_name = distro.split(' ')[0]
+distro_version = distro.split(' ')[1]
+
+
+#########################
+# gtk
+#########################
+
+#gtk from gconf
+try:
+	gconf_gtk = key.get_value("/desktop/gnome/interface/gtk_theme")
+except:
+	gconf_gtk = "?"
+
+#gtk from mine
+if exists(os.path.expanduser("~/.gtkrc.mine")):
+	for line in open(os.path.expanduser("~/.gtkrc.mine")):
+		if "/gtk-2.0/gtkrc" in line:
+			mygtk=line
+               		break
+	try:
+		mygtk_print = mygtk.split('/')[-3]
+	except:
+		mygtk_print = "?"
+else:
+	mygtk_print = "?"
+
+#gtk from mcs
+if exists(os.path.expanduser("~/.config/xfce4/mcs_settings/gtk.xml")):
+	for line in open(os.path.expanduser("~/.config/xfce4/mcs_settings/gtk.xml")):
+		if "Net/ThemeName" in line:
+			mcs_gtk = line
+               		break
+	try:
+		mcs_gtk_print = mcs_gtk.split('"')[-2]
+	except:
+		mcs_gtk_print = "?"
+else:
+	mcs_gtk_print = "?"
+
+# qt from kde
+if exists(os.path.expanduser("~/.kde/share/config/kdeglobals")):
+	for line in open(os.path.expanduser("~/.kde/share/config/kdeglobals")):
+		if "widgetStyle=" in line:
+			qt_style = line
+               		break
+	try:
+		qt_style_print = qt_style.split('=')[-1][0:-1]
+	except:
+		qt_style_print = "?"
+else:
+	qt_style_print = "?"
+
+#qt from kde4
+if exists(os.path.expanduser("~/.kde4/share/config/kdeglobals")):
+	for line in open(os.path.expanduser("~/.kde4/share/config/kdeglobals")):
+		if "widgetStyle=" in line:
+			qt4_style = line
+               		break
+	try:
+		q4t_style_print = qt4_style.split('=')[-1][0:-1]
+	except:
+		qt4_style_print = "?"
+else:
+	qt4_style_print = "?"
+
+#gtk from kde4
+if exists(os.path.expanduser("~/.kde4/share/config/gtkrc")):
+	for line in open(os.path.expanduser("~/.kde4/share/config/gtkrc")):
+		if "/gtk-2.0/gtkrc" in line:
+			kde4_gtk = line
+               		break
+	try:
+		kde4_gtk_print = kde4_gtk.split('/')[-3]
+	except:
+		kde4_gtk_print = "?"
+else:
+	kde4_gtk_print = "?"
+
+#########################
+# app fonts
+#########################
+
+#font from gconf
+try:
+	gconf_font = key.get_value("/desktop/gnome/interface/font_name")
+except:
+	gconf_font = "?"
+
+#font from mine
+if exists(os.path.expanduser("~/.gtkrc.mine")):
+	for line in open(os.path.expanduser("~/.gtkrc.mine")):
+		if "gtk-font-name" in line:
+			myfont = line
+               		break
+	try:
+		myfont_print = myfont.split('"')[1]
+	except:
+		myfont_print = "?"
+else:
+	myfont_print = "?"
+
+# font from mcs
+if exists(os.path.expanduser("~/.config/xfce4/mcs_settings/gtk.xml")):
+	for line in open(os.path.expanduser("~/.config/xfce4/mcs_settings/gtk.xml")):
+		if "FontName" in line:
+			mcs_font=line
+               		break
+	try:
+		mcs_font_print = mcs_font.split('"')[-2]
+	except:
+		mcs_font_print = "?"
+else:
+	mcs_font_print = "?"
+
+#font from kde
+if exists(os.path.expanduser("~/.kde/share/config/kdeglobals")):
+	for line in open(os.path.expanduser("~/.kde/share/config/kdeglobals")):
+		if "font=" in line:
+			kde_font_string = line
+               		break
+	try:
+		kde_font_name = kde_font_string.split(',')[0]
+		kde_font_print = kde_font_name.split('=')[1]
+	except:
+		kde_font_print = "?"
+else:
+	kde_font_print = "?"
+
+#font from kde4
+if exists(os.path.expanduser("~/.kde4/share/config/kdeglobals")):
+	for line in open(os.path.expanduser("~/.kde4/share/config/kdeglobals")):
+		if "font=" in line:
+			kde4_font_string = line
+               		break
+	try:
+		kde4_font_name = kde4_font_string.split(',')[0]
+		kde4_font_print = kde4_font_name.split('=')[1]
+	except:
+		kde4_font_print = "?"
+
+else:
+	kde4_font_print = "?"
+
+
+
+#########################
+# term fonts
+#########################
+
+#tilda
+if exists(os.path.expanduser("~/.tilda/config_0")):
+	for line in open(os.path.expanduser("~/.tilda/config_0")):
+		if "font" in line:
+			tildfont=line
+               		break
+	try:
+		tilda_font_print = tildfont.split('"')[1]
+	except:
+		tilda_font_print = "?"
+else:
+	tilda_font_print = "?"
+
+
+
+#gnome-terminal from gconf
+try:
+	gt_font_print = key.get_value("/apps/gnome-terminal/profiles/Default/font")
+except:
+	gt_font_print = "?"
+
+#urxvt
+if exists(os.path.expanduser("~/.Xdefaults")):
+	for line in open(os.path.expanduser("~/.Xdefaults")):
+		if "urxvt*font" in line:
+			urxvtfont=line
+              	 	break
+	try:
+		urxvt_font_print = urxvtfont.split(':')[-1][0:-1]
+	except:
+		urxvt_font_print = "?"
+else:
+	urxvt_font_print = "?"
+
+#xfce4-terminal
+if exists(os.path.expanduser("~/.config/Terminal/terminalrc")):
+	for line in open(os.path.expanduser("~/.config/Terminal/terminalrc")):
+		if "FontName" in line:
+			xfctfont=line
+               		break
+	try:
+		xfct_font_print = xfctfont.split('=')[-1][0:-1]
+	except:
+		xfct_font_print = "?"
+else:
+	xfct_font_print = "?"
+
+#########################
+# icons
+#########################
+#icons from gconf
+try:
+	gconf_icons = key.get_value("/desktop/gnome/interface/icon_theme")
+except:
+	gconf_icons = "?"
+
+#icons from mine
+if exists(os.path.expanduser("~/.gtkrc.mine")):
+	for line in open(os.path.expanduser("~/.gtkrc.mine")):
+		if "icon-theme" in line:
+			myicons = line
+			break
+	try:
+		myicons_print = myicons.split('"')[1]
+	except:
+		myicons_print = "?"
+else:
+	myicons_print = "?"
+
+
+#icons from mcs
+if exists(os.path.expanduser("~/.config/xfce4/mcs_settings/gtk.xml")):
+	for line in open(os.path.expanduser("~/.config/xfce4/mcs_settings/gtk.xml")):
+		if "IconThemeName" in line:
+			mcs_icons=line
+               		break
+	try:
+		mcs_icons_print = mcs_icons.split('"')[-2]
+	except:
+		mcs_icons_print = "?"
+else:
+	mcs_icons_print = "?"
+
+#icons from kde
+if exists(os.path.expanduser("~/.kde/share/config/kdeglobals")):
+	for line in open(os.path.expanduser("~/.kde/share/config/kdeglobals")):
+		if "Theme=" in line:
+			kde_icons = line
+               		break
+	try:
+		kde_icons_print = kde_icons.split('=')[1][0:-1]
+	except:
+		kde_icons_print = "?"
+else:
+	kde_icons_print = "?"
+
+#icons from kde4
+if exists(os.path.expanduser("~/.kde4/share/config/kdeglobals")):
+	for line in open(os.path.expanduser("~/.kde4/share/config/kdeglobals")):
+		if "Theme=" in line:
+			kde4_icons = line
+               		break
+	try:
+		kde4_icons_print = kwin4_icons.split('=')[1][0:-1]
+	except:
+		kde4_icons_print = "?"
+else:
+	kde4_icons_print = "?"
+#########################
+# wm
+#########################
+#metacity
+try:
+	metacity_theme = key.get_value("/apps/metacity/general/theme")
+except:
+	metacity_theme = "?"
+
+#ob
+if exists(os.path.expanduser("~/.config/openbox/rc.xml")):
+	for line in open(os.path.expanduser("~/.config/openbox/rc.xml")):
+		if "<name>" in line:
+			ob_theme = line 
+			break
+	try:
+		ob_theme_print = ob_theme.split('>')[1][0:-6]
+	except:
+		ob_theme_print = "?"
+else:
+	ob_theme_print = "?"
+
+
+#xfwm4
+if exists(os.path.expanduser("~/.config/xfce4/mcs_settings/xfwm4.xml")):
+	for line in open(os.path.expanduser("~/.config/xfce4/mcs_settings/xfwm4.xml")):
+		if "ThemeName" in line:
+			xfwm4_theme=line
+               		break
+	try:
+		xfwm4_theme_print = xfwm4_theme.split('"')[-2]
+	except:
+		xfwm4_theme_print = "?"
+else:
+	xfwm4_theme_print = "?"
+
+#kwin
+if exists(os.path.expanduser("~/.kde/share/config/kwinrc")):
+	for line in open(os.path.expanduser("~/.kde/share/config/kwinrc")):
+		if "PluginLib" in line:
+			kwin_style = line
+               		break
+	try:
+		kwin_style_print = kwin_style.split('_')[-1][0:-1]
+	except:
+		kwin_style_print = "?"
+else:
+	kwin_style_print = "?"
+
+#kwin4
+if exists(os.path.expanduser("~/.kde4/share/config/kwinrc")):
+	for line in open(os.path.expanduser("~/.kde4/share/config/kwinrc")):
+		if "PluginLib" in line:
+			kwin4_style = line
+               		break
+	try:
+		kwin4_style_print = kwin4_style.split('_')[-1][0:-1]
+	except:
+		kwin4_style_print = "?"
+else:
+	kwin4_style_print = "?"
+
+#emerald
+if exists(os.path.expanduser("~/.emerald/theme/theme.ini")):
+	for line in open(os.path.expanduser("~/.emerald/theme/theme.ini")):
+		if "description=" in line:
+			emerald_theme = line
+               		break
+	try:
+		emerald_theme_print = emerald_theme.split('=')[-1][0:-1]
+	except:
+		emerald_theme_print = "?"
+else:
+	emerald_theme_print = "?"
+
+#pekwm
+if exists(os.path.expanduser("~/.pekwm/config")):
+	for line in open(os.path.expanduser("~/.pekwm/config")):
+		if "Theme" in line:
+			pekwm_theme = line
+               		break
+	try:
+		pekwm_theme_print = pekwm_theme.split('/')[-1][0:-2]
+	except:
+		pekwm_theme_print = "?"
+else:
+	pekwm_theme_print = "?"
+
+
+#########################
+# wall
+#########################
+#wall from gconf
+try:
+	gconf_wall = key.get_value("/desktop/gnome/background/picture_filename")
+	gconf_wall_print = gconf_wall.split('/')[-1]
+except:
+	gconf_wall_print = "?"
+
+#plain ng from gconf
+try:
+	gconf_bg = key.get_value("/desktop/gnome/background/color_shading_type")
+except:
+	gconf_bg = "?"
+
+#feh
+if exists(os.path.expanduser("~/.fehbg")):
+	for line in open(os.path.expanduser("~/.fehbg")):
+		if "feh" in line:
+			feh_wall = line
+			break
+	try:
+		feh_wall_print = feh_wall.split('/')[-1][0:-2]
+	except:
+		feh_wall_print = "?"
+else:
+	feh_wall_print = "?"
+
+
+#wall from mcs
+if exists(os.path.expanduser("~/.config/xfce4/mcs_settings/desktop.xml")):
+	for line in open(os.path.expanduser("~/.config/xfce4/mcs_settings/desktop.xml")):
+		if "imagepath" in line:
+			mcs_wall=line
+               		break
+	try:
+		mcs_wall_print = mcs_wall.split('/')[-2][0:-1]
+	except:
+		mcs_wall_print = "?"
+else:
+	mcs_wall_print = "?"
+
+#wall from kde
+if exists(os.path.expanduser("~/.kde/share/config/kdesktoprc")):
+	for line in open(os.path.expanduser("~/.kde/share/config/kdesktoprc")):
+		if "Wallpaper[$e]=" in line:
+			kde_wall = line
+               		break
+	try:
+		kde_wall_print = kde_wall.split('/')[-1][0:-1]
+	except:
+		kde_wall_print = "?"
+else:
+	kde_wall_print = "?"
+
+#wall from kde4
+if exists(os.path.expanduser("~/.kde4/share/config/plasma-appletsrc")):
+	for line in open(os.path.expanduser("~/.kde4/share/config/plasma-appletsrc")):
+		if "wallpaper=" in line:
+			kde4_wall = line
+               		break
+	try:
+		kde4_wall_print = kde4_wall.split('/')[-1][0:-1]
+	except:
+		kde4_wall_print= "?"
+else:
+	kde4_wall_print= "?"
+
+#wall from fb
+if exists(os.path.expanduser("~/.fluxbox/lastwallpaper")):
+	for line in open(os.path.expanduser("~/.fluxbox/lastwallpaper")):
+		if "/" in line:
+			fb_wall = line
+               		break
+	try:
+		fb_wall_print = fb_wall.split('/')[-1][0:-6]
+	except:
+		fb_wall_print = "?"
+else:
+	fb_wall_print = "?"
+
+
+   
+
+######################
+#print info
+######################
+print "\n"+color1+distro_name+" "+distro_version+end+"\n"
+
+# try auto configs
+if default_de == 1:
+	print color2+"  Metacity:"+end+"              "+metacity_theme
+	print color2+"  GTK:"+end+"                   "+gconf_gtk
+	print color2+"  Font (Apps):"+end+"           "+gconf_font
+	print color2+"  Font (Terminal):"+end+"       "+gt_font_print
+	print color2+"  Icons:"+end+"                 "+gconf_icons
+	print color2+"  Wall:"+end+"                  "+gconf_wall_print+"\n"
+
+elif default_de == 2:
+	print color2+"  Emerald:"+end+"               "+emerald_theme_print
+	print color2+"  GTK:"+end+"                   "+gconf_gtk
+	print color2+"  Font (Apps):"+end+"           "+gconf_font
+	print color2+"  Font (Terminal):"+end+"       "+gt_font_print
+	print color2+"  Icons:"+end+"                 "+gconf_icons
+	print color2+"  Wall:"+end+"                  "+gconf_wall_print+"\n"
+
+elif default_de == 3:
+	print color2+"  Openbox:"+end+"               "+ob_theme_print
+	print color2+"  GTK:"+end+"                   "+gconf_gtk
+	print color2+"  Font (Apps):"+end+"           "+gconf_font
+	print color2+"  Font (Terminal):"+end+"       "+gt_font_print
+	print color2+"  Icons:"+end+"                 "+gconf_icons
+	print color2+"  Wall:"+end+"                  "+gconf_wall_print+"\n"
+
+elif default_de == 4:
+	print color2+"  Xfwm4:"+end+"                 "+xfwm4_theme_print
+	print color2+"  GTK:"+end+"                   "+mcs_gtk_print
+	print color2+"  Font (Apps):"+end+"           "+mcs_font_print
+	print color2+"  Font (Terminal):"+end+"       "+xfct_font_print
+	print color2+"  Icons:"+end+"                 "+mcs_icons_print
+	print color2+"  Wall:"+end+"                  "+mcs_wall_print+"\n"
+
+elif default_de == 5:
+	print color2+"  Emerald:"+end+"               "+emerald_theme_print
+	print color2+"  GTK:"+end+"                   "+mcs_gtk_print
+	print color2+"  Font (Apps):"+end+"           "+mcs_font_print
+	print color2+"  Font (Terminal):"+end+"       "+xfct_font_print
+	print color2+"  Icons:"+end+"                 "+mcs_icons_print
+	print color2+"  Wall:"+end+"                  "+mcs_wall_print+"\n"
+
+elif default_de == 6:
+	print color2+"  Openbox:"+end+"               "+ob_theme_print
+	print color2+"  GTK:"+end+"                   "+mcs_gtk_print
+	print color2+"  Font (Apps):"+end+"           "+mcs_font_print
+	print color2+"  Font (Terminal):"+end+"       "+xfct_font_print
+	print color2+"  Icons:"+end+"                 "+mcs_icons_print
+	print color2+"  Wall:"+end+"                  "+mcs_wall_print+"\n"
+
+elif default_de == 7:
+	print color2+"  Kwin:"+end+"                  "+kwin_style_print
+	print color2+"  QT Style:"+end+"              "+qt_style_print
+	print color2+"  Font (Apps):"+end+"           "+kde_font_print
+      # print color2+"  Font (Terminal):"+end+"       "+xfct_font_print
+	print color2+"  Icons:"+end+"                 "+kde_icons_print
+	print color2+"  Wall:"+end+"                  "+kde_wall_print+"\n"
+
+elif default_de == 8:
+	print color2+"  Emerald:"+end+"               "+emerald_theme_print
+	print color2+"  QT Style:"+end+"              "+qt_style_print
+	print color2+"  Font (Apps):"+end+"           "+kde_font_print
+      # print color2+"  Font (Terminal):"+end+"       "+xfct_font_print
+	print color2+"  Icons:"+end+"                 "+kde_icons_print
+	print color2+"  Wall:"+end+"                  "+kde_wall_print+"\n"
+
+elif default_de == 9:
+	print color2+"  Openbox:"+end+"               "+ob_theme_print
+	print color2+"  QT Style:"+end+"              "+qt_style_print
+	print color2+"  Font (Apps):"+end+"           "+kde_font_print
+      # print color2+"  Font (Terminal):"+end+"       "+xfct_font_print
+	print color2+"  Icons:"+end+"                 "+kde_icons_print
+	print color2+"  Wall:"+end+"                  "+kde_wall_print+"\n"
+
+elif default_de == 10:
+	print color2+"  Kwin:"+end+"                  "+kwin4_style_print
+	print color2+"  QT Style:"+end+"              "+qt_style_print
+	print color2+"  Font (Apps):"+end+"           "+kde4_font_print
+      # print color2+"  Font (Terminal):"+end+"       "+xfct_font_print
+	print color2+"  Icons:"+end+"                 "+kde4_icons_print
+	print color2+"  Wall:"+end+"                  "+kde4_wall_print+"\n"
+
+elif default_de == 11:
+	print color2+"  Emerald:"+end+"               "+emerald_theme_print
+	print color2+"  QT Style:"+end+"              "+qt_style_print
+	print color2+"  Font (Apps):"+end+"           "+kde4_font_print
+      # print color2+"  Font (Terminal):"+end+"       "+xfct_font_print
+	print color2+"  Icons:"+end+"                 "+kde4_icons_print
+	print color2+"  Wall:"+end+"                  "+kde4_wall_print+"\n"
+
+elif default_de == 12:
+	print color2+"  Openbox:"+end+"               "+ob_theme_print
+	print color2+"  QT Style:"+end+"              "+qt_style_print
+	print color2+"  Font (Apps):"+end+"           "+kde4_font_print
+      # print color2+"  Font (Terminal):"+end+"       "+xfct_font_print
+	print color2+"  Icons:"+end+"                 "+kde4_icons_print
+	print color2+"  Wall:"+end+"                  "+kde4_wall_print+"\n"
+
+### custom config 	
+#wm
+if default_de != 1 and default_de != 2 and default_de != 3 and default_de != 4 and default_de != 5 and default_de != 6 and default_de != 7 and default_de != 8 and default_de != 9 and default_de != 10 and default_de != 11 and default_de != 12 or default_de == 13:
+	if print_wm == 1:
+		print color2+"  Window Manager:"+end+"        Awesome"
+	elif print_wm == 2:
+		print color2+"  Window Manager:"+end+"        dwm"
+	elif print_wm == 3:
+		print color2+"  Emerald:"+end+"               "+emerald_theme_print
+	elif print_wm == 4:
+		print color2+"  Kwin:"+end+"                  "+kwin_style_print
+	elif print_wm == 5:
+		print color2+"  Kwin:"+end+"                  "+kwin4_style_print
+	elif print_wm == 6:
+		print color2+"  Metacity:"+end+"              "+metacity_theme
+	elif print_wm == 8:
+		print color2+"  PekWM:"+end+"                 "+pekwm_theme_print
+	elif print_wm == 7:
+		print color2+"  Openbox:"+end+"               "+ob_theme_print
+	elif print_wm == 10:
+		print color2+"  Xfwm4:"+end+"                 "+xfwm4_theme_print
+	elif print_wm == 9:
+		print color2+"  Window Manager:"+end+"        wmii"
+	else:
+		print color2+"  Window Manager:"+end+"       ?" #type whatever you want
+
+#qt
+	if print_qt == 1 or print_qt == 2:
+		print color2+"  QT Style:"+end+"              "+qt_style_print
+	
+#gtk
+	if print_gtk == 1:
+		print color2+"  GTK:"+end+"                   "+gconf_gtk
+	elif print_gtk == 2:
+		print color2+"  GTK:"+end+"                   "+mcs_gtk_print
+	elif print_gtk == 3:
+		print color2+"  GTK:"+end+"                   "+mygtk_print
+	elif print_gtk == 4:
+		print color2+"  GTK:"+end+"                   "+kde4_gtk_print
+
+#app font
+	if print_font == 1 :
+		print color2+"  Font (Apps):"+end+"           "+gconf_font
+	elif print_font == 2:
+		print color2+"  Font (Apps):"+end+"           "+mcs_font_print
+	elif print_font == 3 :
+		print color2+"  Font (Apps):"+end+"           "+myfont_print
+	if print_font == 4:
+		print color2+"  Font (Apps):"+end+"           "+kde_font_print
+	elif print_font == 5:
+		print color2+"  Font (Apps):"+end+"           "+kde4_font_print
+
+#term font
+	if print_term == 1:
+		print color2+"  Font (Terminal):"+end+"       "+gt_font_print
+	elif print_term == 2:
+		print color2+"  Font (Terminal):"+end+"       "+tilda_font_print
+	elif print_term == 3:
+		print color2+"  Font (Terminal):"+end+"       "+urxvt_font_print
+	elif print_term == 4:
+		print color2+"  Font (Terminal):"+end+"       "+xfct_font_print
+
+#icons
+	if print_icons == 1:
+		print color2+"  Icons:"+end+"                 "+gconf_icons
+	elif print_icons == 2:
+		print color2+"  Icons:"+end+"                 "+mcs_icons_print 
+	elif print_icons == 3:
+		print color2+"  Icons:"+end+"                 "+myicons_print      
+	elif print_icons == 4:
+		print color2+"  Icons:"+end+"                 "+kde_icons_print   
+	elif print_icons == 5:
+		print color2+"  Icons:"+end+"                 "+kde4_icons_print
+
+#wall
+	if print_wall == 1:
+		print color2+"  Wall:"+end+"                  "+gconf_wall_print+"\n"
+	elif print_wall == 2:
+		print color2+"  Wall:"+end+"                  "+gconf_bg+"\n"
+	elif print_wall == 3:
+		print color2+"  Wall:"+end+"                  "+feh_wall_print+"\n"
+	elif print_wall == 4:
+		print color2+"  Wall:"+end+"                  "+mcs_wall_print+"\n"
+	elif print_wall == 5:
+		print color2+"  Wall:"+end+"                  "+kde_wall_print+"\n"
+	elif print_wall == 6:
+		print color2+"  Wall:"+end+"                  "+kde4_wall_print+"\n"
+	elif print_wall == 7:
+		print color2+"  Wall:"+end+"                  "+fb_wall_print+"\n"
+
+#date/time
+print " "+strftime("%A %d %B %Y")+"\n"
+
+######################
+#take screenshot
+######################
+if call_scrot:
+	call(["sleep", "1"]) #number is delay in seconds. set to at least 1
+	call("scrot")

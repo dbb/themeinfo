@@ -1,0 +1,46 @@
+Installation Instructions
+
+See README before installing.
+
+1. Make 'themeinfo' executable:
+
+	chmod +x themeinfo
+
+2. Move 'themeinfo' to any directory in your path. Check which folders are in
+   your path with the following command:
+
+	$PATH
+
+  It is recommended that you put themeinfo in ~/bin. You can add it to your
+  path with the following 2 commands:
+
+	PATH=$PATH:$HOME/bin
+	export PATH
+
+4. Execute 'themeinfo'
+
+	themeinfo
+
+
+=======================
+
+For system-wide install (NOT recommended) do the following as root:
+
+1. Move 'themeinfo' to /usr/bin:
+
+	mv themeinfo /usr/bin/
+
+
+2. Make 'themeinfo' executable for all users:
+
+	chmod a+x /usr/bin/themeinfo
+
+
+3. Make 'themeinfo' writable (optional):
+
+	chmod a+w /usr/bin/themeinfo
+
+4. Execute 'themeinfo'
+
+	$ themeinfo
+

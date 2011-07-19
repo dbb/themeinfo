@@ -1,0 +1,7 @@
+List of things to do:
+
+-add support for 	Fluxbox (window manager theme)
+		 	IceWM	(window manager theme)
+			Konsole	(terminal font)
+
+-make graphical configurator (pygtk)
